@@ -1,0 +1,31 @@
+* {
+    background-color: lightgreen;
+}
+
+.container {
+    margin: auto;
+    width: 600px;
+    height: 600px;
+    color: darkblue;
+    background-color: lightgreen;
+    border: 6px solid rgb(2, 2, 36);
+    border-radius: 2px;
+
+    display: grid;
+    grid-template: repeat(3, 1fr) / repeat(3, 1fr);
+}
+
+.name {
+    text-align: center;
+    color: rgb(21, 39, 39);
+    font-size: 6em;
+}
+
+.square {
+    border: 6px solid rgb(2, 2, 36);
+    color:rgb(21, 39, 39);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 4em;
+}
