@@ -1,20 +1,20 @@
+const textBox = document.getElementById('text');
+
+//reload page using the refresh button
+function reloadPage() {
+    window.location.reload();
+}
+
+const refreshButton = document.getElementById('refresh');
+
+refreshButton.addEventListener("click", reloadPage)
+
+
+
 const gameBoardObject = (function() {
-    const rows = 3;
-    const columns = 3;
-    let board = [0, 0, 0, 3, 0, 0, 0, 0, 0];
+    const board = [0, 0, 0, 0, 0, 0, 0, 0, 0];
 
     return {board}
-})();
-
-    // Control the value of each square. This will be what is in each array element
-const squareObject = (() => {
-    let value = 0;
-    const playerSelection = (player) => {
-        value = player;
-    }
-    const getValue = () => value; 
-    
-    return {playerSelection, getValue}
 })();
 
     // Find the position of a square in the board array
@@ -24,10 +24,12 @@ function getAttribute(e) {
     const clickedSquare = e.target;
     const arrayPosition = clickedSquare.dataset.position;
 
-    gameControl.checkPlayable(arrayPosition);   
-    alert('hi');
-    gameControl.changeArray(arrayPosition,);
-
+    if (gameControl.checkPlayable(arrayPosition) === true) {
+        gameControl.changeArray(arrayPosition);
+        gameControl.render();
+        gameControl.gameResult();
+        gameControl.switchPlayerTurn();
+    }  
 }
 
 squares.forEach( square => {
@@ -48,31 +50,65 @@ const gameControl = (() => {
         }
     ];
 
-    let activePlayer = players[0];
     // switch between players
+    let activePlayer = players[0];
     const switchPlayerTurn = () => {
         activePlayer = activePlayer === players[0] ? players[1] : players[0];
-        console.log(activePlayer.moveMarker);
     };
     const getActivePlayer = () => activePlayer;
 
 
     // check if the square has already been played
     const checkPlayable = (position) => {
-        if (gameBoardObject.board[position] !== 0) {
-            console.log('you cannot play');
-            return;
+        if (gameBoardObject.board[position] === 0) {
+            return true;
         } else {
-            console.log('you can play');
+            alert('You cannot play on this square.');
+            return false;
         }
     }
+
     // change array element to match board selection
     const changeArray = (position) => {
         gameBoardObject.board[position] = activePlayer.moveMarker;
     }
 
-    return {checkPlayable, changeArray, switchPlayerTurn}
-})();
+    // add the correct html text based on the player choice
+    const render = () => {
+        for (let i = 0; i < gameBoardObject.board.length; i++) {
+            const dataSquare = document.querySelector(`div[data-position="${i}"]`);
+            if (gameBoardObject.board[i] === 0) {
+                dataSquare.innerHTML = '';
+            } else if (gameBoardObject.board[i] === 1) {
+                dataSquare.innerHTML = 'X';
+            } else {
+                dataSquare.innerHTML = 'O';
+            }
+        }
+    }
+    
+    //look at gameboard array. Do any of the winning combo array positions contain only the moveMarker of the current active player? 
+    const winningCombinations = [
+        [0,1,2],
+        [3,4,5],
+        [6,7,8],
+        [0,3,6],
+        [1,4,7],
+        [2,5,8],
+        [0,4,8],
+        [2,4,6],
+    ]; 
 
-squareObject.playerSelection(2);
-console.log(gameBoardObject.board)
+    function gameResult() {
+        winningCombinations.forEach((element, index) => {
+            if (activePlayer.moveMarker === gameBoardObject.board[element[0]] && activePlayer.moveMarker === gameBoardObject.board[element[1]] && activePlayer.moveMarker === gameBoardObject.board[element[2]]) {
+                textBox.textContent = 'You win!';
+            } else if (gameBoardObject.board.every(element => element !== 0)) {
+                textBox.textContent = 'We have a tie.';
+            }
+        })
+    
+    }
+
+    return {checkPlayable, changeArray, switchPlayerTurn, render, gameResult}
+})();
